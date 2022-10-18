@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DeviceApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +18,16 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::group(['prefix' => 'device'], function(){
+    Route::post("/post/temperature", 'DeviceApiController@postTemperatureData');
+    Route::post("/post/relay", 'DeviceApiController@postRelayData');
+    Route::get("/get/relay/{api_token}/{number}", 'DeviceApiController@getRelayData');
+    Route::get("/get/settings/{api_token}", 'DeviceApiController@getDeviceSettings');
+    Route::get("/get/custom_function/{api_token}/{number}", 'DeviceApiController@getDeviceCustomFunctions');
+});
+
+Route::post("/device", 'DeviceDataApiController@addNewDevice');
+
+
+

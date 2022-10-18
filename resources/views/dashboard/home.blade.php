@@ -15,7 +15,7 @@
         <div class="col-md-4">
           <div class="status-card dark-box rounded d-flex align-items-center">
             <div class="image-box">
-              <img src="images/relay_icon.png" alt="hugenerd" class="rounded">
+              <img src="{{ URL::asset('images/relay_icon.png') }}" alt="hugenerd" class="rounded">
             </div>
             <div class="text-box">
               <h5>Реле №1</h5>
@@ -26,7 +26,7 @@
         <div class="col-md-4">
           <div class="status-card dark-box rounded d-flex align-items-center">
             <div class="image-box">
-              <img src="images/relay_icon.png" alt="hugenerd" class="rounded">
+              <img src="{{ URL::asset('images/relay_icon.png') }}" alt="hugenerd" class="rounded">
             </div>
             <div class="text-box">
               <h5>Реле №2</h5>
@@ -37,7 +37,7 @@
         <div class="col-md-4">
           <div class="status-card dark-box rounded d-flex align-items-center">
             <div class="image-box">
-              <img src="images/device-icon.png" alt="hugenerd" class="rounded">
+              <img src="{{ URL::asset('images/device-icon.png') }}" alt="hugenerd" class="rounded">
             </div>
             <div class="text-box">
               <h5>MyHeat A1</h5>
