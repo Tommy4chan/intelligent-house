@@ -23,11 +23,15 @@ class Device extends Model
     }
 
     public function settingsData(){
-        return $this->hasMany(Device_Settings::class);
+        return $this->hasOne(Device_Settings::class);
     }
 
     public function customFunctionsData(){
         return $this->hasMany(Device_Custom_Functions::class);
+    }
+
+    public function temperature(){
+        return $this->hasMany(Device_Temperature_Data::class);
     }
 
     public function isSelected(){

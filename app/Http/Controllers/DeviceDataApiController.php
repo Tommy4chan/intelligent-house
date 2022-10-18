@@ -9,6 +9,7 @@ use App\Device_Settings;
 use App\Device_Temperature_Data;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class DeviceDataApiController extends Controller
@@ -36,6 +37,47 @@ class DeviceDataApiController extends Controller
             $device_relay_data = new Device_Relay_Data();
             $device_relay_data->device_id = $device->id;
             $device_relay_data->save();
+        }
+    }
+
+    function isUserOwnerOfDevice($device_id){
+        $user_devices_id = Auth::user()->devices_ids;
+        foreach($user_devices_id as $id){
+            if($id == $device_id){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getRelayData($device_id, $number){
+        if($this->isUserOwnerOfDevice($device_id)){
+            $device = Device::where('id', $device_id)->first();
+            $relaysData = $device->relayData;
+            $relay = $relaysData[$number];
+            return($relay);
+        }
+    }
+    
+    public function getDeviceTemperatures($device_id){
+        if($this->isUserOwnerOfDevice($device_id)){
+            $device = Device::where('id', $device_id)->first();
+            $temperatureData = [];
+            for ($i=0; $i < 6; $i++) { 
+                array_push($temperatureData, $device->temperature()->where('number', $i)->orderBy("id", "desc")->first()["temperature"]);
+            }
+            return ($temperatureData);
+        }
+    }
+
+    public function getDeviceTemperatureByDate($device_id, $temperature_number, $date){
+        if($this->isUserOwnerOfDevice($device_id)){
+            $device = Device::where('id', $device_id)->first();
+            $temperatureDataByDate = [];
+            for ($i=0; $i < 24; $i++) {
+                array_push($temperatureDataByDate, $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->whereTime('created_at', '>=', $i . ':00:00')->whereTime('created_at', '<=', $i . ':59:59')->avg('temperature'));
+            }
+            return ($temperatureDataByDate);
         }
     }
 }

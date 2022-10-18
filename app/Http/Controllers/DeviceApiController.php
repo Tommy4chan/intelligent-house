@@ -14,10 +14,11 @@ class DeviceApiController extends Controller
         if($device != NULL){
             $device->update(['updated_at' => Carbon::now()]);
             $device_temperature = new Device_Temperature_Data();
-            $device_temperature->device_id = $request->device_id;
+            $device_temperature->device_id = $device->id;
+            $device_temperature->number = $request->number;
             $device_temperature->temperature = $request->temperature;
             $device_temperature->save();
-            return("200");
+            return("ok");
         }
     }
 
@@ -28,7 +29,7 @@ class DeviceApiController extends Controller
             $relay = $relaysData[$request->number];
             $relay->status = $request->status;
             $relay->save();
-            return("200");
+            return("ok");
         }
     }
 
@@ -45,7 +46,7 @@ class DeviceApiController extends Controller
         $device = Device::where('api_token', $api_token)->first();
         if($device != NULL){
             $settingsData = $device->settingsData;
-            return($settingsData[0]);
+            return($settingsData);
         }
     }
 
