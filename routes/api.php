@@ -20,15 +20,41 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix' => 'device'], function(){
-    Route::post("/post/temperature", 'DeviceApiController@postTemperatureData');
-    Route::post("/post/relay", 'DeviceApiController@postRelayData');
-    Route::get("/get/relay/{api_token}/{number}", 'DeviceApiController@getRelayData');
-    Route::get("/get/settings/{api_token}", 'DeviceApiController@getDeviceSettings');
-    Route::get("/get/custom_function/{api_token}/{number}", 'DeviceApiController@getDeviceCustomFunctions');
-    Route::get("/get/sync_type/{api_token}", 'DeviceApiController@getDeviceSyncType');
+    Route::group(['prefix' => 'post'], function(){
+        Route::post("/temperature", 'DeviceApiController@postTemperatureData');
+        Route::post("/relay", 'DeviceApiController@postRelayData');
+    });
+    Route::group(['prefix' => 'get'], function(){
+        Route::get("/relay/{api_token}/{number}", 'DeviceApiController@getRelayData');
+        Route::get("/settings/{api_token}", 'DeviceApiController@getSettings');
+        Route::get("/custom_function/{api_token}/{number}", 'DeviceApiController@getCustomFunction');
+        Route::get("/sync_type/{api_token}", 'DeviceApiController@getSyncType');
+    });
 });
 
-Route::post("/device", 'DeviceDataApiController@addNewDevice');
+Route::group(['prefix' => 'data'], function(){
+    Route::post("/device", 'DeviceDataApiController@addNewDevice');
+    Route::group(['prefix' => 'post'], function(){
+        Route::post("/relay", 'DeviceDataApiController@postDeviceRelayData');
+        Route::post("/device/settings/name", 'DeviceDataApiController@postDeviceSettingsName');
+        Route::post("/device/settings/failsafe", 'DeviceDataApiController@postDeviceSettingsFailsafe');
+        Route::post("/device/settings/flash", 'DeviceDataApiController@postDeviceSettingsFlash');
+        Route::post("/device/settings/delete", 'DeviceDataApiController@postDeviceSettingsDelete');
+        Route::post("/device/settings/custom_function", 'DeviceDataApiController@postDeviceSettingsCustomFunction');
+        Route::post("/device/settings/wifi", 'DeviceDataApiController@postDeviceSettingsWifi');
+    });
+    Route::group(['prefix' => 'get'], function(){
+        Route::get("/relay/{device_id}/{number}", 'DeviceDataApiController@getRelayData');
+        Route::get("/temperatures/{device_id}", 'DeviceDataApiController@getDeviceTemperatures');
+        Route::get("/temperature/{device_id}/{temperature_number}/{date}", 'DeviceDataApiController@getDeviceTemperatureByDate');
+        Route::get("/status/{device_id}/", 'DeviceDataApiController@getDeviceStatus');
+        Route::get("/logs/{device_id}/{logs_number}", 'DeviceDataApiController@getDeviceLogs');
+        Route::get("/settings/{device_id}", 'DeviceDataApiController@getDeviceSettings');
+        Route::get("/custom_function/{device_id}/{number}", 'DeviceDataApiController@getDeviceCustomFunction');
+    });
+});
+
+
 
 
 

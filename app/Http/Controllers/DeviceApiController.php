@@ -41,7 +41,7 @@ class DeviceApiController extends Controller
         }
     }
 
-    public function getDeviceSettings($api_token){
+    public function getSettings($api_token){
         $device = Device::where('api_token', $api_token)->first();
         if($device != NULL){
             $settingsData = $device->settingsData;
@@ -49,7 +49,7 @@ class DeviceApiController extends Controller
         }
     }
 
-    public function getDeviceCustomFunctions($api_token, $number){
+    public function getCustomFunction($api_token, $number){
         $device = Device::where('api_token', $api_token)->first();
         if($device != NULL){
             $customFunctionsData = $device->customFunctionsData;
@@ -58,7 +58,7 @@ class DeviceApiController extends Controller
         }
     }
 
-    public function getDeviceSyncType($api_token){
+    public function getSyncType($api_token){
         $device = Device::where('api_token', $api_token)->first();
         if($device != NULL){
             $syncType = $device->sync_type;
