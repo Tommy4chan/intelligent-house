@@ -754,6 +754,9 @@ h2 .bi{
 }
 
 @media (max-width: 1201px){
+    .dropdown-item{
+        padding: 4px 10px;
+    }
     .device-status p{
         font-size: 14px;
     }
@@ -780,7 +783,7 @@ h2 .bi{
         font-size: 13.5px;
     }
     .dropdown span{
-        font-size: 13px;
+        font-size: 12px;
     }
     .offcanvas-title{
         font-size: 18px;
@@ -886,7 +889,7 @@ h2 .bi{
         padding: 20px 10px;
     }
     .dropdown span{
-        font-size: 15px;
+        font-size: 14px;
     }
     .status-card .image-box img{
         width: 80px;

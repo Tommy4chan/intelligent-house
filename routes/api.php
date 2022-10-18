@@ -25,6 +25,7 @@ Route::group(['prefix' => 'device'], function(){
     Route::get("/get/relay/{api_token}/{number}", 'DeviceApiController@getRelayData');
     Route::get("/get/settings/{api_token}", 'DeviceApiController@getDeviceSettings');
     Route::get("/get/custom_function/{api_token}/{number}", 'DeviceApiController@getDeviceCustomFunctions');
+    Route::get("/get/sync_type/{api_token}", 'DeviceApiController@getDeviceSyncType');
 });
 
 Route::post("/device", 'DeviceDataApiController@addNewDevice');
