@@ -40,6 +40,39 @@ class DeviceDataApiController extends Controller
         }
     }
 
+    function generateTemperature($device_id, $date){
+        if($this->isUserOwnerOfDevice($device_id)){
+            for ($i=0; $i < 24; $i++) {
+                for ($x=0; $x < 6; $x++) { 
+                    $temperature = new Device_Temperature_Data();
+                    $temperature->device_id = $device_id;
+                    $temperature->number = $x;
+                    $temperature->temperature = rand(-2000, 8000) / 100;
+                    $temperature->created_at = Carbon::createFromFormat('Y-m-d H:i:s',  $date . ' ' . $i . ':' . '05' . ':00');
+                    $temperature->save();
+                    $temperature = new Device_Temperature_Data();
+                    $temperature->device_id = $device_id;
+                    $temperature->number = $x;
+                    $temperature->temperature = rand(-2000, 8000) / 100;
+                    $temperature->created_at = Carbon::createFromFormat('Y-m-d H:i:s',  $date . ' ' . $i . ':' . '10' . ':15'); 
+                    $temperature->save();
+                    $temperature = new Device_Temperature_Data();
+                    $temperature->device_id = $device_id;
+                    $temperature->number = $x;
+                    $temperature->temperature = rand(-2000, 8000) / 100;
+                    $temperature->created_at = Carbon::createFromFormat('Y-m-d H:i:s',  $date . ' ' . $i . ':' . '15' . ':30'); 
+                    $temperature->save();
+                    $temperature = new Device_Temperature_Data();
+                    $temperature->device_id = $device_id;
+                    $temperature->number = $x;
+                    $temperature->temperature = rand(-2000, 8000) / 100;
+                    $temperature->created_at = Carbon::createFromFormat('Y-m-d H:i:s',  $date . ' ' . $i . ':' . '20' . ':45'); 
+                    $temperature->save();
+                }
+            }
+        }
+    }
+
     function isUserOwnerOfDevice($device_id){
         $user_devices_id = Auth::user()->devices_ids;
         foreach($user_devices_id as $id){
@@ -75,7 +108,7 @@ class DeviceDataApiController extends Controller
             $device = Device::where('id', $device_id)->first();
             $temperatureDataByDate = [];
             for ($i=0; $i < 24; $i++) {
-                array_push($temperatureDataByDate, $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->whereTime('created_at', '>=', $i . ':00:00')->whereTime('created_at', '<=', $i . ':59:59')->avg('temperature'));
+                array_push($temperatureDataByDate, sprintf('%0.2f', $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->whereTime('created_at', '>=', $i . ':00:00')->whereTime('created_at', '<=', $i . ':59:59')->avg('temperature')));
             }
             return ($temperatureDataByDate);
         }

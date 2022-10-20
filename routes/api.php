@@ -45,6 +45,7 @@ Route::middleware('auth:api')->group(function () {
             Route::post("/device/settings/wifi", 'DeviceDataApiController@postDeviceSettingsWifi');
         });
         Route::group(['prefix' => 'get'], function(){
+            Route::get("/gentemp/{device_id}/{number}", 'DeviceDataApiController@generateTemperature');
             Route::get("/relay/{device_id}/{number}", 'DeviceDataApiController@getRelayData');
             Route::get("/temperatures/{device_id}", 'DeviceDataApiController@getDeviceTemperatures');
             Route::get("/temperature/{device_id}/{temperature_number}/{date}", 'DeviceDataApiController@getDeviceTemperatureByDate');
