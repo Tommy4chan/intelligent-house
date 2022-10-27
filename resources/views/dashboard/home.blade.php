@@ -96,8 +96,8 @@
             <h3>Статус пристрою</h3>
             <p class="gray-text">Синхронізація: 01-10-2022 10:56</p>
             <p class="gray-text">Перезавантажено: 01-10-2022 10:56</p>
+            <p class="gray-text">Версія прошивки: V1.1.2</p>
             <p class="gray-text">Мережа: www.matrixtel.net</p>
-            <p class="gray-text">Сигнал: нормальний</p>
           </div>
         </div>
         <div class="col-lg-4">

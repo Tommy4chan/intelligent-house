@@ -34,6 +34,10 @@ class Device extends Model
         return $this->hasMany(Device_Temperature_Data::class);
     }
 
+    public function logs(){
+        return $this->hasMany(Device_Logs::class);
+    }
+
     public function isSelected(){
         if(session('selected_device') == $this->id){
             return 'choosed';

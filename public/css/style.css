@@ -902,15 +902,27 @@ h2 .bi{
         font-size: 15px;
     }
     .chart-card input{
-        font-size: 15px;
+        font-size: 18px;
+        width: 100%;
+    }
+    .chart-card .text-box{
+        display: block !important;
     }
     .date{
-        font-size: 15px;
+        display: flex;
+        width: 230px;
+        margin: 15px 0;
+        padding: 10px 20px;
+        justify-content: space-between!important;
+        font-size: 18px;
     }
     .device-status p{
         font-size: 14px;
     }
     .logs p{
         font-size: 14px;
+    }
+    .relay-controll p{
+        font-size: 20px;
     }
 }

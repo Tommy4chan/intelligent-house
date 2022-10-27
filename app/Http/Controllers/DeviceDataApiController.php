@@ -88,7 +88,7 @@ class DeviceDataApiController extends Controller
             $device = Device::where('id', $device_id)->first();
             $relaysData = $device->relayData;
             $relay = $relaysData[$number];
-            return($relay);
+            return $relay;
         }
     }
     
@@ -99,7 +99,7 @@ class DeviceDataApiController extends Controller
             for ($i=0; $i < 6; $i++) { 
                 array_push($temperatureData, $device->temperature()->where('number', $i)->orderBy("id", "desc")->first()["temperature"]);
             }
-            return ($temperatureData);
+            return $temperatureData;
         }
     }
 
@@ -108,9 +108,39 @@ class DeviceDataApiController extends Controller
             $device = Device::where('id', $device_id)->first();
             $temperatureDataByDate = [];
             for ($i=0; $i < 24; $i++) {
-                array_push($temperatureDataByDate, sprintf('%0.2f', $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->whereTime('created_at', '>=', $i . ':00:00')->whereTime('created_at', '<=', $i . ':59:59')->avg('temperature')));
+                $avgTemperature = $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->whereTime('created_at', '>=', $i . ':00:00')->whereTime('created_at', '<=', $i . ':59:59')->avg("temperature");
+                if($avgTemperature != null){
+                    array_push($temperatureDataByDate, sprintf('%0.2f', $avgTemperature));
+                }
+                else{
+                    array_push($temperatureDataByDate, NULL);
+                }
             }
-            return ($temperatureDataByDate);
+            if($date != Carbon::today()->format('Y-m-d')){
+                array_push($temperatureDataByDate, sprintf('%0.2f', $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->orderBy('id', 'desc')->first()["temperature"]));
+            }
+            else{
+                array_push($temperatureDataByDate, max($temperatureDataByDate));
+            }
+            array_push($temperatureDataByDate, sprintf('%0.2f', $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->orderBy('id', 'desc')->min("temperature")));
+            array_push($temperatureDataByDate, sprintf('%0.2f', $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->orderBy('id', 'desc')->max("temperature")));
+
+            return $temperatureDataByDate;
+        }
+    }
+
+    public function getDeviceStatus($device_id){
+        if($this->isUserOwnerOfDevice($device_id)){
+            $device = Device::where('id', $device_id)->first();
+            $deviceStatus = ['error', 'error', 'error', 'error'];
+            $lastRebootTime = $device->logs()->where('log_type', 11)->orderBy("id", "desc")->first();
+            $deviceStatus[0] = $device['updated_at'];
+            if($lastRebootTime){
+                $deviceStatus[1] = $lastRebootTime['created_at'];
+            }
+            $deviceStatus[2] = $device['firmware_version'];
+            $deviceStatus[3] = $device->settingsData()->first()['wifi_ssid'];
+            return $deviceStatus;
         }
     }
 }
