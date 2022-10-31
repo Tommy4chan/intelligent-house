@@ -92,6 +92,12 @@
   @yield('main_content')
 
   <script>
+    setDeviceId({{ Session::get('selected_device') }});
+    setDeviceApiToken("{{$devices[Session::get('selected_device')-1]->api_token}}");
+    setUserApiToken("{{Auth::user()->api_token}}");
+  </script>
+
+  <script>
 
     function set_select_data(item){
       $(".btn:first-child").find("img").attr("src", $(item).find("img").attr("src"));
@@ -109,7 +115,8 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
-                  alert(data[0]);
+                  setDeviceId(data);
+                  refreshData();
                 }
             });
         }

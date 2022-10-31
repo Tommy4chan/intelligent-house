@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\Device_Custom_Functions;
+use App\Device_Logs;
 use App\Device_Relay_Data;
 use App\Device_Settings;
 use App\Device_Temperature_Data;
@@ -42,8 +43,11 @@ class DeviceDataApiController extends Controller
 
     function generateTemperature($device_id, $date){
         if($this->isUserOwnerOfDevice($device_id)){
-            for ($i=0; $i < 24; $i++) {
+            for ($i=0; $i < 22; $i++) {
                 for ($x=0; $x < 6; $x++) { 
+                    if($i == 10){
+                        break;
+                    }
                     $temperature = new Device_Temperature_Data();
                     $temperature->device_id = $device_id;
                     $temperature->number = $x;
@@ -73,6 +77,13 @@ class DeviceDataApiController extends Controller
         }
     }
 
+    public function createNewLog($device_id, $type){
+        $log = new Device_Logs();
+        $log->device_id = $device_id;
+        $log->log_type = $type;
+        $log->save();
+    }
+
     function isUserOwnerOfDevice($device_id){
         $user_devices_id = Auth::user()->devices_ids;
         foreach($user_devices_id as $id){
@@ -81,6 +92,24 @@ class DeviceDataApiController extends Controller
             }
         }
         return false;
+    }
+
+    public function postDeviceRelayData(Request $request){
+        $device_id = $request->device_id;
+        if($this->isUserOwnerOfDevice($device_id)){
+            $device = Device::where('id', $device_id)->first();
+            if($request->state == 0){
+                $this->createNewLog($device_id, '22' . $request->number);
+            }
+            else{
+                $this->createNewLog($device_id, '21' . $request->number);
+            }
+            $relaysData = $device->relayData;
+            $relay = $relaysData[$request->number];
+            $relay->state = $request->state;
+            $relay->save();
+            return 'ok';
+        }
     }
 
     public function getRelayData($device_id, $number){
@@ -97,7 +126,7 @@ class DeviceDataApiController extends Controller
             $device = Device::where('id', $device_id)->first();
             $temperatureData = [];
             for ($i=0; $i < 6; $i++) { 
-                array_push($temperatureData, $device->temperature()->where('number', $i)->orderBy("id", "desc")->first()["temperature"]);
+                array_push($temperatureData, sprintf('%0.2f', $device->temperature()->where('number', $i)->whereDate('created_at', Carbon::today()->format('Y-m-d'))->latest()->first()["temperature"]));
             }
             return $temperatureData;
         }
@@ -113,18 +142,18 @@ class DeviceDataApiController extends Controller
                     array_push($temperatureDataByDate, sprintf('%0.2f', $avgTemperature));
                 }
                 else{
-                    array_push($temperatureDataByDate, NULL);
+                    array_push($temperatureDataByDate, -255);
                 }
             }
-            if($date != Carbon::today()->format('Y-m-d')){
+            if($date == Carbon::today()->format('Y-m-d')){
                 array_push($temperatureDataByDate, sprintf('%0.2f', $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->orderBy('id', 'desc')->first()["temperature"]));
             }
             else{
-                array_push($temperatureDataByDate, max($temperatureDataByDate));
+                array_push($temperatureDataByDate, max($temperatureDataByDate) == -255 ? '0.00' : max($temperatureDataByDate) );
             }
             array_push($temperatureDataByDate, sprintf('%0.2f', $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->orderBy('id', 'desc')->min("temperature")));
             array_push($temperatureDataByDate, sprintf('%0.2f', $device->temperature()->where('number', $temperature_number)->whereDate('created_at', $date)->orderBy('id', 'desc')->max("temperature")));
-
+            array_push($temperatureDataByDate, $temperature_number);
             return $temperatureDataByDate;
         }
     }
@@ -133,7 +162,7 @@ class DeviceDataApiController extends Controller
         if($this->isUserOwnerOfDevice($device_id)){
             $device = Device::where('id', $device_id)->first();
             $deviceStatus = ['error', 'error', 'error', 'error'];
-            $lastRebootTime = $device->logs()->where('log_type', 11)->orderBy("id", "desc")->first();
+            $lastRebootTime = $device->logs()->where('log_type', 11)->latest()->first();
             $deviceStatus[0] = $device['updated_at'];
             if($lastRebootTime){
                 $deviceStatus[1] = $lastRebootTime['created_at'];
@@ -141,6 +170,16 @@ class DeviceDataApiController extends Controller
             $deviceStatus[2] = $device['firmware_version'];
             $deviceStatus[3] = $device->settingsData()->first()['wifi_ssid'];
             return $deviceStatus;
+        }
+    }
+
+    public function getDeviceLogs($device_id, $logs_count){
+        if($this->isUserOwnerOfDevice($device_id)){
+            $device = Device::where('id', $device_id)->first();
+            $deviceLogs = [];
+            foreach($device->logs()->latest()->take($logs_count)->get() as $log)
+                array_push($deviceLogs, trans('logs.' . $log['log_type']) . $log['created_at']->format('Y-m-d H:i'));
+            return $deviceLogs;
         }
     }
 }

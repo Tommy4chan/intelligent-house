@@ -27,5 +27,9 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('routeactive', function($route){
             return "<?php echo Route::currentRouteNamed($route) ?  'choosed' : '' ?>";
         });
+
+        Blade::directive('isPositive', function($value){
+            return "<?php echo $value == 1 ?  'positive' : 'negative' ?>";
+        });
     }
 }
